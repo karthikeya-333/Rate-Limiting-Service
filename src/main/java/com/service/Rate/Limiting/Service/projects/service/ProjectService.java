@@ -52,12 +52,10 @@ public class ProjectService {
     }
 
     private ProjectResponse toResponse(Project p) {
-        String key = apiKeyService.getApiKeyForProject(p.getId());
         return ProjectResponse.builder()
                 .name(p.getName())
                 .description(p.getDescription())
                 .createdAt(p.getCreatedAt())
-                .keyHash(key)
                 .build();
     }
 }

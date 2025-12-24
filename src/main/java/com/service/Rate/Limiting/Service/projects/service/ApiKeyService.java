@@ -22,16 +22,16 @@ public class ApiKeyService {
     private String hashSecret;
 
     public String createApiKey(UUID projectId) {
-        String key = hash("RLS" + UUID.randomUUID());
+        String rawKey = "RLS" + UUID.randomUUID();
 
         ApiKey apiKey = ApiKey.builder()
                 .projectId(projectId)
-                .keyHash(key)
+                .keyHash(hash(rawKey))
                 .isActive(Boolean.TRUE)
                 .build();
 
         apiKeyRepository.save(apiKey);
-        return key;
+        return rawKey;
     }
 
     public String getApiKeyForProject(UUID projectId) {
