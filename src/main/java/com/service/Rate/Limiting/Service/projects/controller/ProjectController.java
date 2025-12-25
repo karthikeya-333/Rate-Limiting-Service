@@ -1,4 +1,4 @@
-package com.service.Rate.Limiting.Service.projects;
+package com.service.Rate.Limiting.Service.projects.controller;
 
 import com.service.Rate.Limiting.Service.auth.service.JwtService;
 import com.service.Rate.Limiting.Service.common.ApiResponse;

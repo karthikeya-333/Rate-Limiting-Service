@@ -29,6 +29,7 @@ public class ProjectService {
         String key = apiKeyService.createApiKey(saved.getId());
 
         return ProjectResponse.builder()
+                .id(saved.getId())
                 .name(saved.getName())
                 .description(saved.getDescription())
                 .createdAt(saved.getCreatedAt())
@@ -53,6 +54,7 @@ public class ProjectService {
 
     private ProjectResponse toResponse(Project p) {
         return ProjectResponse.builder()
+                .id(p.getId())
                 .name(p.getName())
                 .description(p.getDescription())
                 .createdAt(p.getCreatedAt())
