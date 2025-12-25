@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -22,8 +21,8 @@ public class RateLimitService {
     private final RateLimitRepository rateLimitRepository;
     private final ProjectRepository projectRepository;
 
-    public RateLimitResponse createOrUpdateLimit(RateLimitRegisterRequest req, UUID userId) {
-        UUID projectId = req.getProjectId();
+    public RateLimitResponse createOrUpdateLimit(RateLimitRegisterRequest req, Long userId) {
+        Long projectId = req.getProjectId();
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new IllegalArgumentException("Project not found"));
 
@@ -32,7 +31,7 @@ public class RateLimitService {
         }
 
         Optional<RateLimit> existing = rateLimitRepository
-                .findByProjectIdAndDimensionAndWindow(req.getProjectId(), req.getDimension(), req.getWindow());
+                .findByProjectIdAndDimensionAndRateLimitWindow(req.getProjectId(), req.getDimension(), req.getRateLimitWindow());
 
         RateLimit limit;
         if (existing.isPresent()) {
@@ -43,7 +42,7 @@ public class RateLimitService {
             limit = RateLimit.builder().
                     projectId(req.getProjectId())
                     .dimension(req.getDimension())
-                    .window(req.getWindow())
+                    .rateLimitWindow(req.getRateLimitWindow())
                     .limitValue(req.getLimitValue())
                     .createdAt(Instant.now())
                     .updatedAt(Instant.now()).build();
@@ -52,7 +51,7 @@ public class RateLimitService {
         return mapToDTO(rateLimitRepository.save(limit));
     }
 
-    public List<RateLimitResponse> getLimitsForProject(UUID projectId, UUID userId) {
+    public List<RateLimitResponse> getLimitsForProject(Long projectId, Long userId) {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new IllegalArgumentException("Project not found"));
 
@@ -65,7 +64,18 @@ public class RateLimitService {
         return limits.stream().map(this::mapToDTO).toList();
     }
 
-    public void deleteLimit(UUID limitId) {
+    public void deleteLimit(Long limitId, Long userId) {
+
+        RateLimit limit = rateLimitRepository.findById(limitId)
+                .orElseThrow(() -> new IllegalArgumentException("Rate limit not found"));
+
+        Project project = projectRepository.findById(limit.getProjectId())
+                .orElseThrow(() -> new IllegalArgumentException("Project not found"));
+
+        if(!project.getUserId().equals(userId)) {
+            throw new EntityNotFoundException("Project not found for this user");
+        }
+
         rateLimitRepository.deleteById(limitId);
     }
 
@@ -73,7 +83,7 @@ public class RateLimitService {
         return RateLimitResponse.builder()
                 .projectId(limit.getProjectId())
                 .dimension(limit.getDimension())
-                .window(limit.getWindow())
+                .rateLimitWindow(limit.getRateLimitWindow())
                 .limitValue(limit.getLimitValue())
                 .createdAt(limit.getCreatedAt())
                 .updatedAt(limit.getUpdatedAt())

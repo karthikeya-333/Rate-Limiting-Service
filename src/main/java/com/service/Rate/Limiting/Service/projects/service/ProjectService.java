@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -18,7 +17,7 @@ public class ProjectService {
     private final ProjectRepository projectRepository;
     private final ApiKeyService apiKeyService;
 
-    public ProjectResponse createProject(UUID userId, ProjectRequest req) {
+    public ProjectResponse createProject(Long userId, ProjectRequest req) {
         Project project = Project.builder()
                 .userId(userId)
                 .name(req.getName())
@@ -37,14 +36,14 @@ public class ProjectService {
                 .build();
     }
 
-    public List<ProjectResponse> listProjects(UUID userId) {
-        return projectRepository.findByUserIdAndIsActive(userId,Boolean.TRUE)
+    public List<ProjectResponse> listProjects(Long userId) {
+        return projectRepository.findByUserIdAndActive(userId,Boolean.TRUE)
                 .stream()
                 .map(this::toResponse)
                 .toList();
     }
 
-    public void deleteProject(UUID projectId, UUID userId) {
+    public void deleteProject(Long projectId, Long userId) {
         Project project = projectRepository.findByIdAndUserId(projectId, userId)
                 .orElseThrow(() -> new EntityNotFoundException("Project not found"));
 

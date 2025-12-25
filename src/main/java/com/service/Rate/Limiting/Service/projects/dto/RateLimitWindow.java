@@ -1,5 +1,5 @@
 package com.service.Rate.Limiting.Service.projects.dto;
 
-public enum Window {
+public enum RateLimitWindow {
     MINUTE, HOUR, DAY
 }

@@ -11,16 +11,18 @@ import java.util.UUID;
 @Entity
 @Table(name = "projects")
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Builder
 public class Project {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private UUID id;
+    private Long id;
 
     @Column
     @NotNull
-    private UUID userId;
+    private Long userId;
 
     @Column
     @NotNull

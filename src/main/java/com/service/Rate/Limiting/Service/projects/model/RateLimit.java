@@ -1,14 +1,14 @@
 package com.service.Rate.Limiting.Service.projects.model;
 
-import com.service.Rate.Limiting.Service.projects.dto.Window;
+import com.service.Rate.Limiting.Service.projects.dto.RateLimitWindow;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.*;
 import java.time.Instant;
-import java.util.UUID;
 
 @Entity
 @Table(
@@ -19,21 +19,23 @@ import java.util.UUID;
 )
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class RateLimit {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private UUID id;
+    private Long id;
 
     @NotNull
-    private UUID projectId;
+    private Long projectId;
 
     @NotNull
     private String dimension;
 
     @Enumerated(EnumType.STRING)
     @NotNull
-    private Window window;    // MINUTE, HOUR, DAY
+    private RateLimitWindow rateLimitWindow;    // MINUTE, HOUR, DAY
 
     private int limitValue;
 

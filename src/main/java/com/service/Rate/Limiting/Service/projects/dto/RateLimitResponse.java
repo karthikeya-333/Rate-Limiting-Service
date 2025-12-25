@@ -4,14 +4,13 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.time.Instant;
-import java.util.UUID;
 
 @Data
 @Builder
 public class RateLimitResponse {
-    private UUID projectId;
+    private Long projectId;
     private String dimension;
-    private Window window;
+    private RateLimitWindow rateLimitWindow;
     private Integer limitValue;
     private Instant createdAt;
     private Instant updatedAt;

@@ -21,7 +21,7 @@ public class ApiKeyService {
     @Value("${app.api-key.hash-secret}")
     private String hashSecret;
 
-    public String createApiKey(UUID projectId) {
+    public String createApiKey(Long projectId) {
         String rawKey = "RLS" + UUID.randomUUID();
 
         ApiKey apiKey = ApiKey.builder()
@@ -34,14 +34,14 @@ public class ApiKeyService {
         return rawKey;
     }
 
-    public String getApiKeyForProject(UUID projectId) {
-        return apiKeyRepository.findByProjectIdAndStatus(projectId, Boolean.TRUE)
+    public String getApiKeyForProject(Long projectId) {
+        return apiKeyRepository.findByProjectIdAndIsActive(projectId, Boolean.TRUE)
                 .map(ApiKey::getKeyHash)
                 .orElseThrow(() -> new IllegalStateException("Active API key not found for project"));
     }
 
-    public String rotateKey(UUID projectId) {
-        apiKeyRepository.findByProjectIdAndStatus(projectId, Boolean.TRUE)
+    public String rotateKey(Long projectId) {
+        apiKeyRepository.findByProjectIdAndIsActive(projectId, Boolean.TRUE)
                 .ifPresent(key -> {
                     key.setIsActive(Boolean.FALSE);
                     key.setRevokedAt(Instant.now());
@@ -51,7 +51,7 @@ public class ApiKeyService {
         return createApiKey(projectId);
     }
 
-    private String hash(String value) {
+    public String hash(String value) {
         try {
             Mac mac = Mac.getInstance("HmacSHA256");
             SecretKeySpec keySpec =

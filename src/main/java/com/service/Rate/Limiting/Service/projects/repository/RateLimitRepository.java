@@ -1,22 +1,21 @@
 package com.service.Rate.Limiting.Service.projects.repository;
 
 import com.service.Rate.Limiting.Service.projects.model.RateLimit;
-import com.service.Rate.Limiting.Service.projects.dto.Window;
+import com.service.Rate.Limiting.Service.projects.dto.RateLimitWindow;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Repository
-public interface RateLimitRepository extends JpaRepository<RateLimit, UUID> {
+public interface RateLimitRepository extends JpaRepository<RateLimit, Long> {
 
-    List<RateLimit> findByProjectId(UUID projectId);
+    List<RateLimit> findByProjectId(Long projectId);
 
-    Optional<RateLimit> findByProjectIdAndDimensionAndWindow(UUID projectId, String dimension, Window window);
+    Optional<RateLimit> findByProjectIdAndDimensionAndRateLimitWindow(Long projectId, String dimension, RateLimitWindow rateLimitWindow);
 
-    List<RateLimit> findByProjectIdAndDimension(UUID projectId, String dimension);
+    List<RateLimit> findByProjectIdAndDimension(Long projectId, String dimension);
 
-    void deleteByProjectIdAndDimensionAndWindow(UUID projectId, String dimension, Window window);
+    void deleteByProjectIdAndDimensionAndRateLimitWindow(Long projectId, String dimension, RateLimitWindow rateLimitWindow);
 }
