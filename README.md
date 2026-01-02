@@ -1,3 +1,5 @@
+<h1>Rate Limiting Service</h1>
+
 This repository contains a rate limiting service implemented using Spring Boot that controls how many requests an API can receive within a given time window. It is designed to protect backend services from excessive traffic and misuse by validating API keys and enforcing configurable request limits.
 
 The service allows creating projects, assigning API keys to them, and defining rate-limit rules such as requests per minute, hour, or day. Each incoming request is checked against these rules before being allowed. If the request exceeds the defined limit, it is rejected.
