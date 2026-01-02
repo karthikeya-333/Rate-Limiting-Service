@@ -23,11 +23,11 @@ public class RateLimitService {
 
     public RateLimitResponse createOrUpdateLimit(RateLimitRegisterRequest req, Long userId) {
         Long projectId = req.getProjectId();
-        Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new IllegalArgumentException("Project not found"));
+        Project project = projectRepository.findByIdAndUserId(projectId, userId)
+                .orElseThrow(() -> new EntityNotFoundException("Project not found"));
 
-        if (!project.getUserId().equals(userId)) {
-            throw new EntityNotFoundException("Project not found for this user");
+        if(!project.isActive()){
+            throw new IllegalArgumentException("Project is not active");
         }
 
         Optional<RateLimit> existing = rateLimitRepository
@@ -52,12 +52,9 @@ public class RateLimitService {
     }
 
     public List<RateLimitResponse> getLimitsForProject(Long projectId, Long userId) {
-        Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new IllegalArgumentException("Project not found"));
 
-        if (!project.getUserId().equals(userId)) {
-            throw new EntityNotFoundException("Project not found for this user");
-        }
+        projectRepository.findByIdAndUserId(projectId, userId)
+                .orElseThrow(() -> new EntityNotFoundException("Project not found"));
 
         List<RateLimit> limits= rateLimitRepository.findByProjectId(projectId);
 
@@ -69,12 +66,8 @@ public class RateLimitService {
         RateLimit limit = rateLimitRepository.findById(limitId)
                 .orElseThrow(() -> new IllegalArgumentException("Rate limit not found"));
 
-        Project project = projectRepository.findById(limit.getProjectId())
-                .orElseThrow(() -> new IllegalArgumentException("Project not found"));
-
-        if(!project.getUserId().equals(userId)) {
-            throw new EntityNotFoundException("Project not found for this user");
-        }
+        projectRepository.findByIdAndUserId(limit.getProjectId(), userId)
+                .orElseThrow(() -> new EntityNotFoundException("Project not found"));
 
         rateLimitRepository.deleteById(limitId);
     }

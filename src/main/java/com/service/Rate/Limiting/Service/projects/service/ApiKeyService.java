@@ -2,6 +2,7 @@ package com.service.Rate.Limiting.Service.projects.service;
 
 import com.service.Rate.Limiting.Service.projects.model.ApiKey;
 import com.service.Rate.Limiting.Service.projects.repository.ApiKeyRepository;
+import com.service.Rate.Limiting.Service.projects.repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ import java.util.UUID;
 public class ApiKeyService {
 
     private final ApiKeyRepository apiKeyRepository;
+    private final ProjectRepository projectRepository;
 
     @Value("${app.api-key.hash-secret}")
     private String hashSecret;
@@ -34,13 +36,11 @@ public class ApiKeyService {
         return rawKey;
     }
 
-    public String getApiKeyForProject(Long projectId) {
-        return apiKeyRepository.findByProjectIdAndIsActive(projectId, Boolean.TRUE)
-                .map(ApiKey::getKeyHash)
-                .orElseThrow(() -> new IllegalStateException("Active API key not found for project"));
-    }
+    public String rotateKey(Long projectId, Long userId) {
 
-    public String rotateKey(Long projectId) {
+        projectRepository.findByIdAndUserId(projectId, userId)
+                .orElseThrow(() -> new IllegalArgumentException("Project not found"));
+
         apiKeyRepository.findByProjectIdAndIsActive(projectId, Boolean.TRUE)
                 .ifPresent(key -> {
                     key.setIsActive(Boolean.FALSE);

@@ -16,8 +16,8 @@ public class RateLimitCheckController {
 
     @PostMapping("/check")
     public ResponseEntity<RateLimitCheckResponse> check(
-            @Valid @RequestHeader("X-API-Key") String apiKey,
-            @Valid @RequestBody RateLimitCheckRequest request
+            @RequestHeader("X-API-Key") @Valid String apiKey,
+            @RequestBody @Valid RateLimitCheckRequest request
     ) {
 
         boolean allowed = rateLimitCheckService.check(

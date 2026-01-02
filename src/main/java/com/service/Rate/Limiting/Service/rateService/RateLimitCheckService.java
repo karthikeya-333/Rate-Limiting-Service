@@ -25,7 +25,7 @@ public class RateLimitCheckService {
     public boolean check( String projectId,String apiKey, String dimension) {
 
         String hashKey= apiKeyService.hash(apiKey);
-        ApiKey key = apiKeyRepository
+        apiKeyRepository
                 .findByProjectIdAndKeyHashAndIsActive(Long.valueOf(projectId), hashKey, true)
                 .orElseThrow(() -> new IllegalArgumentException("INVALID_API_KEY"));
 
@@ -41,10 +41,9 @@ public class RateLimitCheckService {
             if (count == null) count = 0;
 
             if (count >= limit.getLimitValue()) {
-                return false; // limit exceeded
+                return false;
             }
 
-            // increment counter and set TTL
             redisTemplate.opsForValue().increment(redisKey);
             redisTemplate.expire(redisKey, getWindowDuration(limit.getRateLimitWindow()));
         }

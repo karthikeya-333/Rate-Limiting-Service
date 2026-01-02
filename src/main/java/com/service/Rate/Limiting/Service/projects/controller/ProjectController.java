@@ -24,7 +24,7 @@ public class ProjectController {
 
     @PostMapping
     public ResponseEntity<ApiResponse<ProjectResponse>> create(
-            @RequestHeader("Authorization") String authHeader,
+            @RequestHeader("Authorization") @Valid String authHeader,
             @RequestBody @Valid ProjectRequest req
     ) {
         Long userId = Long.valueOf(jwtService.extractUserId(authHeader.substring(7)));
@@ -40,7 +40,7 @@ public class ProjectController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<ProjectResponse>>> list(
-            @RequestHeader("Authorization") String authHeader
+            @RequestHeader("Authorization") @Valid String authHeader
     ) {
         Long userId = Long.valueOf(jwtService.extractUserId(authHeader.substring(7)));
         List<ProjectResponse> response = projectService.listProjects(userId);
@@ -67,7 +67,8 @@ public class ProjectController {
             @RequestHeader("Authorization") String authHeader,
             @PathVariable Long projectId
     ) {
-        String key = apiKeyService.rotateKey(projectId);
+        Long userId = Long.valueOf(jwtService.extractUserId(authHeader.substring(7)));
+        String key = apiKeyService.rotateKey(projectId,userId);
         return ResponseEntity.ok(
                 ApiResponse.<String>builder()
                         .success(true)

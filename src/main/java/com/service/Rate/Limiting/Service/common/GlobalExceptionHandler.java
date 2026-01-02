@@ -1,6 +1,5 @@
 package com.service.Rate.Limiting.Service.common;
 
-import com.service.Rate.Limiting.Service.common.ApiResponse;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -8,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -66,6 +66,18 @@ public class GlobalExceptionHandler {
                         .build()
         );
     }
+
+    @ExceptionHandler(NoHandlerFoundException.class)
+    public ResponseEntity<ApiResponse<Void>> handleNoHandler(NoHandlerFoundException ex) {
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                ApiResponse.<Void>builder()
+                        .success(false)
+                        .message("Endpoint not found")
+                        .build()
+        );
+    }
+
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleOther(Exception ex) {

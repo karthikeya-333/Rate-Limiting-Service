@@ -21,6 +21,7 @@ public class ProjectService {
         Project project = Project.builder()
                 .userId(userId)
                 .name(req.getName())
+                .active(Boolean.TRUE)
                 .description(req.getDescription())
                 .build();
 
