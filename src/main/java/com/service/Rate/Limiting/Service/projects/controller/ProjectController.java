@@ -1,4 +1,4 @@
-package com.service.Rate.Limiting.Service.projects;
+package com.service.Rate.Limiting.Service.projects.controller;
 
 import com.service.Rate.Limiting.Service.auth.service.JwtService;
 import com.service.Rate.Limiting.Service.common.ApiResponse;
@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/projects")
@@ -25,10 +24,10 @@ public class ProjectController {
 
     @PostMapping
     public ResponseEntity<ApiResponse<ProjectResponse>> create(
-            @RequestHeader("Authorization") String authHeader,
+            @RequestHeader("Authorization") @Valid String authHeader,
             @RequestBody @Valid ProjectRequest req
     ) {
-        UUID userId = UUID.fromString(jwtService.extractUserId(authHeader.substring(7)));
+        Long userId = Long.valueOf(jwtService.extractUserId(authHeader.substring(7)));
         ProjectResponse response= projectService.createProject(userId, req);
         return ResponseEntity.ok(
                 ApiResponse.<ProjectResponse>builder()
@@ -41,9 +40,9 @@ public class ProjectController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<ProjectResponse>>> list(
-            @RequestHeader("Authorization") String authHeader
+            @RequestHeader("Authorization") @Valid String authHeader
     ) {
-        UUID userId = UUID.fromString(jwtService.extractUserId(authHeader.substring(7)));
+        Long userId = Long.valueOf(jwtService.extractUserId(authHeader.substring(7)));
         List<ProjectResponse> response = projectService.listProjects(userId);
         return ResponseEntity.ok(
                 ApiResponse.<List<ProjectResponse>>builder()
@@ -57,18 +56,19 @@ public class ProjectController {
     @DeleteMapping("/{projectId}")
     public void delete(
             @RequestHeader("Authorization") String authHeader,
-            @PathVariable UUID projectId
+            @PathVariable Long projectId
     ) {
-        UUID userId = UUID.fromString(jwtService.extractUserId(authHeader.substring(7)));
+        Long userId = Long.valueOf(jwtService.extractUserId(authHeader.substring(7)));
         projectService.deleteProject(projectId, userId);
     }
 
     @PostMapping("/{projectId}/rotate-key")
     public ResponseEntity<ApiResponse<String>> rotateKey(
             @RequestHeader("Authorization") String authHeader,
-            @PathVariable UUID projectId
+            @PathVariable Long projectId
     ) {
-        String key = apiKeyService.rotateKey(projectId);
+        Long userId = Long.valueOf(jwtService.extractUserId(authHeader.substring(7)));
+        String key = apiKeyService.rotateKey(projectId,userId);
         return ResponseEntity.ok(
                 ApiResponse.<String>builder()
                         .success(true)

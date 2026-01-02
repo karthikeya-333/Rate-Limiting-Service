@@ -2,8 +2,10 @@ package com.service.Rate.Limiting.Service.auth.service;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 import java.time.Instant;
@@ -13,9 +15,11 @@ import java.util.UUID;
 @Service
 public class JwtService {
 
-    private final Key key = Keys.hmacShaKeyFor(
-            "CHANGE_THIS_SECRET_TO_64_CHARACTERS_LONG_SECURE_KEY_1234567890".getBytes()
-    );
+    private Key key ;
+
+    public JwtService( @Value("${app.jwt.secret}") String secret) {
+        this.key= Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+    }
 
     public String generateToken(String userId, String email) {
         return Jwts.builder()

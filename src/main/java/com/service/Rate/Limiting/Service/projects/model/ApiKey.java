@@ -10,14 +10,16 @@ import java.util.UUID;
 @Table(name = "api_keys")
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class ApiKey {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private UUID id;
+    private Long id;
 
     @Column(nullable = false)
-    private UUID projectId;
+    private Long projectId;
 
     @Column(nullable = false, unique = true, length = 128)
     private String keyHash;

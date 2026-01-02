@@ -2,6 +2,7 @@ package com.service.Rate.Limiting.Service.projects.service;
 
 import com.service.Rate.Limiting.Service.projects.model.ApiKey;
 import com.service.Rate.Limiting.Service.projects.repository.ApiKeyRepository;
+import com.service.Rate.Limiting.Service.projects.repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -17,31 +18,30 @@ import java.util.UUID;
 public class ApiKeyService {
 
     private final ApiKeyRepository apiKeyRepository;
+    private final ProjectRepository projectRepository;
 
     @Value("${app.api-key.hash-secret}")
     private String hashSecret;
 
-    public String createApiKey(UUID projectId) {
-        String key = hash("RLS" + UUID.randomUUID());
+    public String createApiKey(Long projectId) {
+        String rawKey = "RLS" + UUID.randomUUID();
 
         ApiKey apiKey = ApiKey.builder()
                 .projectId(projectId)
-                .keyHash(key)
+                .keyHash(hash(rawKey))
                 .isActive(Boolean.TRUE)
                 .build();
 
         apiKeyRepository.save(apiKey);
-        return key;
+        return rawKey;
     }
 
-    public String getApiKeyForProject(UUID projectId) {
-        return apiKeyRepository.findByProjectIdAndStatus(projectId, Boolean.TRUE)
-                .map(ApiKey::getKeyHash)
-                .orElseThrow(() -> new IllegalStateException("Active API key not found for project"));
-    }
+    public String rotateKey(Long projectId, Long userId) {
 
-    public String rotateKey(UUID projectId) {
-        apiKeyRepository.findByProjectIdAndStatus(projectId, Boolean.TRUE)
+        projectRepository.findByIdAndUserId(projectId, userId)
+                .orElseThrow(() -> new IllegalArgumentException("Project not found"));
+
+        apiKeyRepository.findByProjectIdAndIsActive(projectId, Boolean.TRUE)
                 .ifPresent(key -> {
                     key.setIsActive(Boolean.FALSE);
                     key.setRevokedAt(Instant.now());
@@ -51,7 +51,7 @@ public class ApiKeyService {
         return createApiKey(projectId);
     }
 
-    private String hash(String value) {
+    public String hash(String value) {
         try {
             Mac mac = Mac.getInstance("HmacSHA256");
             SecretKeySpec keySpec =
