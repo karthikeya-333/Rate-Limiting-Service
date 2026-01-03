@@ -38,7 +38,7 @@ public class ProjectService {
     }
 
     public List<ProjectResponse> listProjects(Long userId) {
-        return projectRepository.findByUserIdAndActive(userId,Boolean.TRUE)
+        return projectRepository.findByUserIdAndActive(userId,Boolean.TRUE).get()
                 .stream()
                 .map(this::toResponse)
                 .toList();
